@@ -1,9 +1,11 @@
 package main
 
 import (
-	"errors"
+	"bufio"
 	"fmt"
-    "elif.com/note"
+	"os"
+	"strings"
+	"elif.com/note"
 )
 
 //ask user the data that shold be stored
@@ -18,29 +20,36 @@ func main() {
     if err != nil{ 
         fmt.Println(err)
     }
+    userNote.DisplayContent()
+    err = userNote.SaveToFile()
+    if err != nil {
+        fmt.Println(err)
+    }
 	
 }
 
 func getNoteData () (string, string, error){
-    titleInput, err := getUserInput("Please enter the title: ")
-    if err != nil{ 
-        return "", "", err
-    }
+    titleInput:= getUserInput("Please enter the title: ")
 
-    contentInput, err := getUserInput("Please enter the text you want to save: ")
-    if err != nil{ 
-        return "", "", err
-    }
-
+    contentInput:= getUserInput("Please enter the text you want to save: ")
     return titleInput, contentInput, nil
 }
 
-func getUserInput (inputText string) (string, error){
+func getUserInput (inputText string) (string){
     fmt.Println(inputText)
     var inputVar string
-    fmt.Scan(&inputVar)
-    if inputText == "" {
-        return "", errors.New("You cannot enter empty string")
+    
+    reader := bufio.NewReader(os.Stdin)
+
+    inputVar, err := reader.ReadString('\n')
+
+    if err != nil {
+        return ""
     }
-    return inputVar, nil
+  /*on Windows, a line break is actually not created with just \n,
+    but instead with \r\n, so we need to delete both
+  */
+    inputVar = strings.TrimSuffix(inputVar, "\n")
+    inputVar = strings.TrimSuffix(inputVar, "\r")
+    return inputVar
 }
