@@ -14,6 +14,11 @@ type Saver interface {
     SaveToFile() error
 }
 
+type outputtapbe interface {
+    Saver
+    DisplayContent()
+}
+
 //ask user the data that shold be stored
 //this data should be written to a file
 
@@ -30,8 +35,8 @@ func main() {
         fmt.Println(err)
         return
     }
-    userNote.DisplayContent()
-    err = saveData(userNote)
+    
+    err = outputData(userNote)
     if err != nil {
         fmt.Println(err)
         return
@@ -45,8 +50,9 @@ func main() {
         fmt.Println(err)
         return
     }
-    todo.DisplayContent()
-    err = saveData(todo)
+
+    err = outputData(todo)
+
     if err != nil {
         fmt.Println(err)
         return
@@ -85,6 +91,15 @@ func getUserInput (inputText string) (string){
     return inputVar
 }
 
+func outputData(data outputtapbe) error{
+    data.DisplayContent()
+    err := saveData(data)
+    if err != nil {
+        return err
+    }
+    return nil
+}
+
 func saveData (data Saver) error{
     err := data.SaveToFile()
     if err != nil {
@@ -94,4 +109,16 @@ func saveData (data Saver) error{
 
     fmt.Println("File has been successfully saved")
     return nil
+}
+
+func getTypeOfTheValue (value interface{}){
+    if typedVal, ok := value.(int) ; ok {
+        fmt.Println("Integer: ", typedVal)
+        return
+    }
+
+    if typedVal, ok := value.(float64) ; ok {
+        fmt.Println("Float: ", typedVal)
+        return
+    }
 }
